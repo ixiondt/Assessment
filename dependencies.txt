@@ -1,0 +1,17 @@
+# A.S.S. — Automated Site Surveyor
+# Server Dependencies
+#
+# Runtime: Node.js 18.x or later
+# Package Manager: npm (included with Node.js)
+#
+# All application dependencies are managed via package.json.
+# Install them with:
+#   npm install
+#
+# System-level requirements:
+# - Node.js >= 18.17.0 (LTS recommended: 20.x or 22.x)
+# - npm >= 9.x (ships with Node.js)
+# - Git (for cloning the repository)
+#
+# No additional system libraries are required.
+# The app uses SQLite via Prisma, which bundles its own SQLite engine.
