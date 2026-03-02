@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Survey {
+  id          String   @id @default(cuid())
+  clientName  String
+  clientType  String
+  address     String?
+  contactName String?
+  contactEmail String?
+  contactPhone String?
+  status      String   @default("draft")
+  overallScore Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  responses   ChecklistResponse[]
+  riskEntries RiskEntry[]
+  photos      Photo[]
+  reports     Report[]
+}
+
+model ChecklistCategory {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  weight      Float    @default(1.0)
+  sortOrder   Int
+  createdAt   DateTime @default(now())
+
+  items       ChecklistItem[]
+}
+
+model ChecklistItem {
+  id          String   @id @default(cuid())
+  categoryId  String
+  text        String
+  description String?
+  sortOrder   Int
+  createdAt   DateTime @default(now())
+
+  category    ChecklistCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  responses   ChecklistResponse[]
+}
+
+model ChecklistResponse {
+  id        String   @id @default(cuid())
+  surveyId  String
+  itemId    String
+  score     Int?
+  notes     String?
+  na        Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  survey    Survey        @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  item      ChecklistItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([surveyId, itemId])
+}
+
+model RiskEntry {
+  id              String   @id @default(cuid())
+  surveyId        String
+  threatName      String
+  threatDescription String?
+  threat          Int
+  vulnerability   Int
+  impact          Int
+  riskScore       Int
+  riskRating      String
+  mitigation      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  survey          Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+}
+
+model Photo {
+  id          String   @id @default(cuid())
+  surveyId    String
+  filename    String
+  filepath    String
+  caption     String?
+  location    String?
+  createdAt   DateTime @default(now())
+
+  survey      Survey       @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  annotations Annotation[]
+}
+
+model Annotation {
+  id      String @id @default(cuid())
+  photoId String
+  type    String
+  x       Float
+  y       Float
+  width   Float?
+  height  Float?
+  label   String?
+  color   String @default("#ef4444")
+
+  photo   Photo  @relation(fields: [photoId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  surveyId    String
+  filename    String
+  filepath    String
+  generatedAt DateTime @default(now())
+
+  survey      Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+}
